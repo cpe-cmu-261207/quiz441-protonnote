@@ -115,14 +115,13 @@ app.get('/balance',
       return
     }
     try {
-      const username = jwt.verify(token, SECRET) as JWTPayload
+      const username = jwt.verify(token.split(" ")[0], SECRET) as JWTPayload
       const db = readDbFile()
-      const user = db.users.filter((data:any) => data.username === username  )
-      if(user){
-        res.status(200).json({
-          balance: amount })
-        return
-      }
+       const user = db.users.find((data:any) => data.username === username  )
+       if(user){
+         res.status(200).json({balance : user.balance})
+          return
+       } 
     }
     catch(err){
       res.status(401).json({ message: 'Invalid token'})
@@ -136,29 +135,7 @@ app.get('/balance',
 
 app.post('/withdraw',
   (req, res) => {
-    const token = req.headers.authorization
-    const {amount} = req.body
-    if (!token) {
-      res.status(401).json({ message: 'Invalid token'})
-      return
-    }
-    try {
-      const username = jwt.verify(token, SECRET) as JWTPayload
-      const db = readDbFile()
-      const user = db.users.find((data : any) => data.username === username)
-      if(user){
-        res.status(200).json({
-          balance: user.balance-amount})
-        return
-      }
-    }
-    catch(err){
-      res.status(401).json({ message: 'Invalid token'})
-      return
-    }
-    //Is amount <= 0 ?
-    if (!validationResult(req).isEmpty())
-      return res.status(400).json({ message: "Invalid data" })
+    
   })
 
 app.delete('/reset', (req, res) => {
